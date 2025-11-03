@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تحويل Word إلى PDF</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <style>
+    body {
+      font-family: "Cairo", sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
+      margin: 0;
+      padding: 30px;
+    }
+    h1 {
+      color: #e3342f;
+    }
+    input {
+      margin: 15px;
+    }
+    button {
+      background-color: #e3342f;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    button:hover {
+      background-color: #c8231f;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>تحويل Word إلى PDF</h1>
+  <input type="file" id="wordFile" accept=".doc,.docx">
+  <br>
+  <button onclick="convertToPDF()">تحويل</button>
+
+  <script>
+    async function convertToPDF() {
+      const input = document.getElementById('wordFile');
+      if (!input.files.length) {
+        alert('من فضلك اختر ملف Word أولاً');
+        return;
+      }
+
+      const file = input.files[0];
+      const arrayBuffer = await file.arrayBuffer();
+
+      // نحول DOCX إلى نص HTML أولًا
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      const htmlContent = result.value;
+
+      // نجهز النص في ملف PDF
+      const docDefinition = {
+        content: [
+          { text: 'محتوى ملف Word:', fontSize: 16, bold: true, margin: [0, 0, 0, 10] },
+          { text: htmlContent.replace(/<[^>]+>/g, ''), fontSize: 12 }
+        ]
+      };
+
+      pdfMake.createPdf(docDefinition).download('converted.pdf');
+    }
+  </script>
+
+</body>
+</html>
