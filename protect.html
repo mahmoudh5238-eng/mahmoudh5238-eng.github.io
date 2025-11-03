@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حماية ملف PDF بكلمة مرور</title>
+  <style>
+    body {
+      font-family: "Cairo", sans-serif;
+      text-align: center;
+      background: #f8f9fa;
+      padding: 40px;
+    }
+    h1 { color: #e63946; }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #e63946;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    button:hover {
+      background-color: #d62828;
+    }
+    #status {
+      margin-top: 20px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔐 حماية ملف PDF بكلمة مرور</h1>
+  <p>اختر ملف PDF وأدخل كلمة مرور لحمايته</p>
+
+  <input type="file" id="pdfFile" accept="application/pdf"><br>
+  <input type="password" id="password" placeholder="أدخل كلمة المرور"><br>
+  <button id="protectBtn">حماية الملف</button>
+
+  <p id="status"></p>
+
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script>
+    const protectBtn = document.getElementById("protectBtn");
+    const pdfFile = document.getElementById("pdfFile");
+    const passwordInput = document.getElementById("password");
+    const status = document.getElementById("status");
+
+    protectBtn.addEventListener("click", async () => {
+      const file = pdfFile.files[0];
+      const password = passwordInput.value.trim();
+
+      if (!file) {
+        status.textContent = "من فضلك اختر ملف PDF.";
+        return;
+      }
+      if (!password) {
+        status.textContent = "من فضلك أدخل كلمة مرور.";
+        return;
+      }
+
+      status.textContent = "جاري حماية الملف...";
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+      // حفظ الملف مع الحماية
+      const pdfBytes = await pdfDoc.save({
+        encrypt: {
+          userPassword: password,
+          ownerPassword: password,
+          permissions: {
+            printing: 'highResolution',
+            modifying: false,
+            copying: false
+          }
+        }
+      });
+
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "protected.pdf";
+      a.click();
+
+      status.textContent = "✅ تم إنشاء ملف PDF محمي بكلمة مرور!";
+    });
+  </script>
+</body>
+</html>
