@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دمج ملفات PDF</title>
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <style>
+    body {
+      font-family: "Cairo", sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
+      margin: 0;
+      padding: 30px;
+    }
+    h1 {
+      color: #e3342f;
+    }
+    input {
+      margin: 15px;
+    }
+    button {
+      background-color: #e3342f;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    button:hover {
+      background-color: #c8231f;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>دمج ملفات PDF</h1>
+  <input type="file" id="pdfFiles" accept="application/pdf" multiple>
+  <br>
+  <button onclick="mergePDFs()">دمج الملفات</button>
+
+  <script>
+    async function mergePDFs() {
+      const { PDFDocument } = PDFLib;
+      const input = document.getElementById('pdfFiles');
+      if (!input.files.length) {
+        alert('من فضلك اختر ملفات PDF أولاً');
+        return;
+      }
+
+      const mergedPdf = await PDFDocument.create();
+      for (const file of input.files) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(arrayBuffer);
+        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        copiedPages.forEach(page => mergedPdf.addPage(page));
+      }
+
+      const mergedPdfFile = await mergedPdf.save();
+      const blob = new Blob([mergedPdfFile], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'merged.pdf';
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
