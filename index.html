@@ -1,83 +1,63 @@
 <!DOCTYPE html>
-<html lang="ar">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>دمج ملفات PDF | PDF Merger</title>
-    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
-    <style>
-      body {
-        font-family: "Cairo", sans-serif;
-        text-align: center;
-        margin: 80px auto;
-        background: #f8f9fa;
-        color: #333;
-      }
-      h1 {
-        color: #d32f2f;
-      }
-      .upload-box {
-        border: 2px dashed #d32f2f;
-        padding: 30px;
-        margin: 30px auto;
-        width: 90%;
-        max-width: 400px;
-        background: white;
-        border-radius: 20px;
-      }
-      input[type="file"] {
-        margin-top: 10px;
-      }
-      button {
-        background: #d32f2f;
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 10px;
-        cursor: pointer;
-        margin-top: 20px;
-        font-size: 16px;
-      }
-      button:hover {
-        background: #b71c1c;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>🧩 دمج ملفات PDF أونلاين</h1>
-    <p>ارفع أكتر من ملف PDF وهنجمعهم في ملف واحد.</p>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>موقع PDF الذكي</title>
+  <style>
+    body {
+      font-family: "Cairo", sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #e3342f;
+      color: white;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 50px;
+    }
+    .tool {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 200px;
+      margin: 15px;
+      padding: 30px 10px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .tool:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .tool h3 {
+      margin-top: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
 
-    <div class="upload-box">
-      <input type="file" id="pdfFiles" accept="application/pdf" multiple />
-      <br />
-      <button onclick="mergePDFs()">دمج الملفات</button>
-    </div>
+  <header>موقع PDF الذكي</header>
 
-    <script>
-      async function mergePDFs() {
-        const { PDFDocument } = PDFLib;
-        const files = document.getElementById("pdfFiles").files;
-        if (files.length < 2) {
-          alert("اختار ملفين PDF على الأقل!");
-          return;
-        }
+  <div class="tools">
+    <div class="tool"><h3>دمج ملفات PDF</h3></div>
+    <div class="tool"><h3>ضغط ملفات PDF</h3></div>
+    <div class="tool"><h3>تحويل PDF إلى Word</h3></div>
+    <div class="tool"><h3>تحويل Word إلى PDF</h3></div>
+    <div class="tool"><h3>تقسيم ملف PDF</h3></div>
+    <div class="tool"><h3>حماية ملف PDF</h3></div>
+  </div>
 
-        const mergedPdf = await PDFDocument.create();
-
-        for (let file of files) {
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await PDFDocument.load(arrayBuffer);
-          const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-          copiedPages.forEach((page) => mergedPdf.addPage(page));
-        }
-
-        const mergedPdfBytes = await mergedPdf.save();
-        const blob = new Blob([mergedPdfBytes], { type: "application/pdf" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "merged.pdf";
-        link.click();
-      }
-    </script>
-  </body>
+</body>
 </html>
